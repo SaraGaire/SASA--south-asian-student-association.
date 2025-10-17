@@ -10,89 +10,603 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
   <style>
-    body{margin:0;font-family:Inter,sans-serif;color:#fff;background:#0f1220;}
-    section{padding:80px 20px;max-width:1180px;margin:auto}
-    .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:999px;padding:12px 18px;cursor:pointer;font-weight:700;text-decoration:none}
-    .btn.primary{background:linear-gradient(135deg,#ff9933,#f2a93b);color:#1b1202}
-    .btn.ghost{background:rgba(255,255,255,.08);color:#fff}
-    .card{background:rgba(255,255,255,.08);border-radius:16px;padding:16px;margin:8px 0}
-    .pill{padding:4px 10px;border-radius:999px;font-size:12px;background:rgba(255,255,255,.06)}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.1)}
+    :root{
+      --bg: #0f1220; /* deep night */
+      --panel: #151935;
+      --muted: #8a90b7;
+      --text: #e9ecff;
+      --gold: #f2a93b;
+      --saffron: #ff9933; /* saffron accent */
+      --green: #138808;
+      --focus: #a3e635;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{ margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"; color:var(--text); background:var(--bg); }
+
+    /* Background motif */
+    body::before{ content:""; position:fixed; inset:0; z-index:-2; background:
+      radial-gradient(1200px 600px at -20% -10%, rgba(255,153,51,.20), transparent 60%),
+      radial-gradient(1000px 600px at 120% 110%, rgba(19,136,8,.18), transparent 62%),
+      radial-gradient(800px 400px at 50% -10%, rgba(255,255,255,.05), transparent 60%); }
+
+    /* Navbar */
+    .nav{position:sticky; top:0; z-index:1000; background:rgba(15,18,32,.7); backdrop-filter: blur(10px); border-bottom:1px solid rgba(255,255,255,.06)}
+    .nav-inner{max-width:1180px; margin:auto; display:flex; align-items:center; justify-content:space-between; padding:14px 18px}
+    .brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--text)}
+    .logo{width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-weight:900; letter-spacing:.5px; background:conic-gradient(from 0deg, var(--saffron), var(--gold), #ffd36b, var(--saffron)); color:#1a1405; box-shadow: 0 4px 14px rgba(242,169,59,.35)}
+    .brand span{font-weight:800; letter-spacing:.4px}
+    .links{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
+    .links a{color:var(--text); text-decoration:none; padding:8px 12px; border-radius:12px}
+    .links a:hover, .links a:focus{background:rgba(255,255,255,.06); outline:none}
+
+    /* Buttons */
+    .btn{display:inline-flex; align-items:center; gap:10px; border:none; border-radius:999px; padding:12px 18px; cursor:pointer; font-weight:700; letter-spacing:.2px; transition:transform .2s ease, box-shadow .2s ease; text-decoration:none}
+    .btn:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+    .btn.primary{background:linear-gradient(135deg, var(--saffron), var(--gold)); color:#1b1202; box-shadow:0 8px 24px rgba(242,169,59,.35)}
+    .btn.ghost{background:rgba(255,255,255,.08); color:var(--text)}
+    .btn:hover{transform:translateY(-1px)}
+
+    /* Sections */
+    section{padding:80px 20px}
+    .container{max-width:1180px; margin:auto}
+    .section-title{font-size: clamp(22px, 2.4vw, 32px); font-weight:900; letter-spacing:.3px; display:flex; align-items:center; gap:14px}
+    .section-title .bar{width:10px; height:24px; border-radius:6px; background:linear-gradient(180deg, var(--gold), #ffe08b)}
+    .muted{color:var(--muted)}
+
+    /* HERO */
+    .hero{display:grid; grid-template-columns: 1.1fr .9fr; gap:38px; align-items:center}
+    .hero h1{font-size: clamp(28px, 4.6vw, 58px); line-height:1.05; margin:0 0 10px; font-weight:900}
+    .hero p{font-size: clamp(16px, 1.4vw, 18px); color:#cfd3ff}
+    .chiprow{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 22px}
+    .chip{border:1px solid rgba(255,255,255,.12); padding:6px 10px; border-radius:999px; font-size:13px; background:rgba(255,255,255,.04)}
+    .hero-card{position:relative; background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.12); padding:22px; border-radius:var(--radius); box-shadow:var(--shadow)}
+    .hero-badges{position:absolute; inset:auto -14px -14px auto; display:flex; gap:8px}
+    .badge{background:#10142c; border:1px solid rgba(255,255,255,.12); color:#cfd3ff; padding:8px 10px; border-radius:12px; font-size:12px}
+    .flagband{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    .flag{display:flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.05); padding:8px 10px; border-radius:12px; font-size:14px}
+
+    .cta{display:flex; gap:12px; flex-wrap:wrap; margin-top:14px}
+
+    /* Cards */
+    .grid{display:grid; gap:18px}
+    .grid.cards{grid-template-columns: repeat(12, 1fr)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.12); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow)}
+    .card:hover{transform:translateY(-2px); transition:.2s ease; box-shadow:0 16px 30px rgba(0,0,0,.45)}
+    .card .media{position:relative; aspect-ratio: 16/9; overflow:hidden}
+    .card .media img{width:100%; height:100%; object-fit:cover}
+    .card .content{padding:16px}
+    .card .meta{display:flex; gap:12px; flex-wrap:wrap; font-size:13px; color:#cfd3ff}
+
+    /* TEAM */
+    .team{grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));}
+    .team .content{display:flex; flex-direction:column; gap:8px}
+    .avatar{width:100%; aspect-ratio: 4/3; object-fit:cover}
+    .socials{display:flex; gap:12px; margin-top:6px}
+    .socials a{color:#dfe3ff; opacity:.9}
+
+    /* Gallery */
+    .gallery-grid{display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:10px}
+    .gallery-grid img{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:12px; cursor:zoom-in; border:1px solid rgba(255,255,255,.12)}
+
+    /* Lightbox */
+    .lightbox{position:fixed; inset:0; background:rgba(0,0,0,.85); display:none; align-items:center; justify-content:center; z-index:2000}
+    .lightbox.open{display:flex}
+    .lightbox img{max-width:92vw; max-height:86vh; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.6)}
+    .lightbox .close, .lightbox .prev, .lightbox .next{position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); width:46px; height:46px; border-radius:50%; display:grid; place-items:center; cursor:pointer}
+    .lightbox .close{top:24px; right:24px; transform:none}
+    .lightbox .prev{left:24px}
+    .lightbox .next{right:24px}
+
+    /* About / Contact */
+    .about p{color:#d6dbff}
+    form{display:grid; gap:10px}
+    input, select, textarea{background:#0d1024; color:var(--text); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:12px; font:inherit}
+    input:focus, select:focus, textarea:focus{outline:3px solid rgba(163,230,53,.4); border-color:rgba(163,230,53,.5)}
+
+    /* Payments */
+    .payments-grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:20px}
+    .method{display:grid; grid-template-columns: 80px 1fr; gap:14px; align-items:center; border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:12px; background:rgba(255,255,255,.04)}
+    .method .icon{width:72px; height:72px; border-radius:12px; background: #0c1022; display:grid; place-items:center; font-size:30px}
+
+    .qr{display:grid; place-items:center; padding:10px; background:#fff; border-radius:12px}
+    .qr img{width:160px; height:160px}
+
+    .table{width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid rgba(255,255,255,.14)}
+    .table th, .table td{padding:12px; text-align:left; border-bottom:1px solid rgba(255,255,255,.08)}
+    .table th{background:rgba(255,255,255,.06); color:#f6f7ff}
+    .pill{padding:4px 10px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06)}
+
+    /* Footer */
+    footer{padding:40px 20px; border-top:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.2)}
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero{grid-template-columns:1fr}
+      .payments-grid{grid-template-columns:1fr}
+    }
+
+    @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
   </style>
 </head>
 <body>
-  <section id="contact">
-    <h2>Contact Us</h2>
-    <form id="contact-form">
-      <input name="name" placeholder="Name" required>
-      <input type="email" name="email" placeholder="Email" required>
-      <textarea name="message" placeholder="Message" required></textarea>
-      <button class="btn primary">Send</button>
-    </form>
+  <!-- NAV -->
+  <nav class="nav" role="navigation" aria-label="Primary">
+    <div class="nav-inner">
+      <a href="#home" class="brand" aria-label="SASA Home">
+        <div class="logo" aria-hidden="true">SA</div>
+        <span>SASA • South Asian Student Association</span>
+      </a>
+      <div class="links" role="menubar" aria-label="Section links">
+        <a role="menuitem" href="#events">Events</a>
+        <a role="menuitem" href="#team">Team</a>
+        <a role="menuitem" href="#gallery">Past Events</a>
+        <a role="menuitem" href="#about">About</a>
+        <a role="menuitem" href="#contact">Contact</a>
+        <a role="menuitem" href="#payments" class="btn ghost" aria-label="Go to membership payments">Payments</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="home" class="container" aria-labelledby="hero-title">
+    <div class="hero">
+      <div>
+        <h1 id="hero-title">Community. Culture. Connection.</h1>
+        <p class="muted">SASA unites students across South Asian heritages to celebrate traditions, foster belonging, and build leadership through events, service, and shared stories.</p>
+        <div class="chiprow" aria-label="What SASA offers">
+          <span class="chip">Cultural Festivals</span>
+          <span class="chip">Community Service</span>
+          <span class="chip">Professional Development</span>
+          <span class="chip">Food & Music</span>
+        </div>
+        <div class="cta" role="group" aria-label="Primary actions">
+          <a class="btn primary" href="#payments"><i class="fa-solid fa-hand-holding-heart"></i>Join Us</a>
+          <a class="btn ghost" href="#events"><i class="fa-solid fa-calendar-days"></i>Explore Events</a>
+          <a class="btn ghost" href="#contact"><i class="fa-solid fa-envelope"></i>Contact</a>
+        </div>
+        <div class="flagband" aria-label="South Asian countries represented">
+          <div class="flag" title="India"><i>🇮🇳</i>India</div>
+          <div class="flag" title="Pakistan"><i>🇵🇰</i>Pakistan</div>
+          <div class="flag" title="Bangladesh"><i>🇧🇩</i>Bangladesh</div>
+          <div class="flag" title="Sri Lanka"><i>🇱🇰</i>Sri Lanka</div>
+          <div class="flag" title="Nepal"><i>🇳🇵</i>Nepal</div>
+          <div class="flag" title="Bhutan"><i>🇧🇹</i>Bhutan</div>
+          <div class="flag" title="Maldives"><i>🇲🇻</i>Maldives</div>
+          <div class="flag" title="Afghanistan"><i>🇦🇫</i>Afghanistan</div>
+        </div>
+      </div>
+      <div>
+        <div class="hero-card" aria-label="SASA highlight">
+          <div class="media" style="border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,.12)">
+            <img src="https://images.unsplash.com/photo-1547394765-185e1e68f34e?q=80&w=1600&auto=format&fit=crop" alt="Vibrant cultural event with traditional South Asian lamps and decor">
+          </div>
+          <div class="hero-badges" aria-hidden="true">
+            <span class="badge"><i class="fa-solid fa-star"></i> New Semester Kickoff</span>
+            <span class="badge"><i class="fa-solid fa-users"></i> Inclusive Community</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
-  <section id="payments">
-    <h2>Membership Payments</h2>
-    <form id="payment-form">
-      <input name="fullName" placeholder="Full Name" required>
-      <select name="method" required>
-        <option value="QR">QR</option>
-        <option value="Apple Pay">Apple Pay</option>
-        <option value="Bank Transfer">Bank Transfer</option>
-      </select>
-      <input name="amount" type="number" min="1" step="1" value="15" required>
-      <button class="btn primary">Submit Confirmation</button>
-    </form>
-    <h3>Recent Payments</h3>
-    <table>
-      <thead><tr><th>Name</th><th>Date</th><th>Method</th><th>Amount</th></tr></thead>
-      <tbody id="payment-rows"></tbody>
-    </table>
+
+  <!-- UPCOMING EVENTS -->
+  <section id="events" aria-labelledby="events-title">
+    <div class="container">
+      <h2 class="section-title"><span class="bar"></span><span id="events-title">Upcoming Events</span></h2>
+      <p class="muted">Catch the next SASA happenings. Join us for culture, food, and friendship.</p>
+      <div id="events-grid" class="grid cards" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); margin-top:14px" aria-live="polite"></div>
+      <div style="margin-top:14px">
+        <a class="btn ghost" href="/events.html" aria-label="View all events on the events page">View All Events</a>
+      </div>
+    </div>
   </section>
+
+  <!-- TEAM -->
+  <section id="team" aria-labelledby="team-title">
+    <div class="container">
+      <h2 class="section-title"><span class="bar"></span><span id="team-title">Core Team & Leadership</span></h2>
+      <p class="muted">Meet the executive committee leading SASA with heart.</p>
+      <div id="team-grid" class="grid team" style="margin-top:16px"></div>
+    </div>
+  </section>
+
+  <!-- PAST EVENTS GALLERY -->
+  <section id="gallery" aria-labelledby="gallery-title">
+    <div class="container">
+      <h2 class="section-title"><span class="bar"></span><span id="gallery-title">Past Events</span></h2>
+      <p class="muted">A glimpse into our favorite moments.</p>
+      <div id="past-events"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT & CONTACT -->
+  <section id="about" aria-labelledby="about-title">
+    <div class="container about">
+      <h2 class="section-title"><span class="bar"></span><span id="about-title">About SASA</span></h2>
+      <p style="max-width:900px">Our mission is to cultivate a welcoming space for students of South Asian descent and allies to celebrate culture, deepen understanding, and contribute to campus and local communities. We host cultural showcases, dialogues, professional workshops, and socials that highlight the diversity of South Asia.</p>
+
+      <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap:22px; margin-top:6px">
+        <div class="card" role="region" aria-labelledby="contact-title">
+          <div class="content">
+            <h3 id="contact-title" style="margin:0 0 6px; font-size:22px">Contact Us</h3>
+            <p class="muted">We'd love to hear from you.</p>
+            <form id="contact-form" aria-label="Contact form">
+              <label> Name
+                <input required name="name" placeholder="Your name" aria-label="Your name">
+              </label>
+              <label> Email
+                <input required type="email" name="email" placeholder="you@university.edu" aria-label="Your email">
+              </label>
+              <label> Message
+                <textarea required name="message" rows="4" placeholder="How can we help?" aria-label="Your message"></textarea>
+              </label>
+              <button class="btn primary" type="submit"><i class="fa-solid fa-paper-plane"></i>Send</button>
+            </form>
+          </div>
+        </div>
+        <div class="card">
+          <div class="content">
+            <h3 style="margin:0 0 6px; font-size:22px">Stay Connected</h3>
+            <p class="muted">Follow, DM, or join the chat.</p>
+            <div class="socials" role="group" aria-label="Social links">
+              <a href="https://instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i> <span style="margin-left:8px">Instagram</span></a>
+              <a href="https://chat.whatsapp.com/" target="_blank" rel="noopener" aria-label="WhatsApp Group"><i class="fa-brands fa-whatsapp"></i> <span style="margin-left:8px">WhatsApp</span></a>
+              <a href="mailto:sasa@university.edu" aria-label="Email"><i class="fa-solid fa-envelope"></i> <span style="margin-left:8px">sasa@university.edu</span></a>
+            </div>
+            <div style="margin-top:16px">
+              <strong>Membership Fee QR</strong>
+              <div class="qr" aria-label="Membership payment QR code">
+                <img alt="Scan to pay — placeholder QR" src="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><rect width='100%' height='100%' fill='white'/><rect x='20' y='20' width='80' height='80' fill='black'/><rect x='220' y='20' width='80' height='80' fill='black'/><rect x='20' y='220' width='80' height='80' fill='black'/><rect x='120' y='120' width='80' height='80' fill='black'/><rect x='220' y='220' width='80' height='80' fill='black'/><rect x='150' y='40' width='20' height='20' fill='black'/><rect x='150' y='260' width='20' height='20' fill='black'/><rect x='260' y='150' width='20' height='20' fill='black'/></svg>">
+              </div>
+              <p class="muted" style="margin-top:8px">Show this QR at the desk or scan with your banking app.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAYMENTS -->
+  <section id="payments" aria-labelledby="payments-title">
+    <div class="container">
+      <h2 class="section-title"><span class="bar"></span><span id="payments-title">Membership Payments</span></h2>
+      <p class="muted">Annual dues support programming and community initiatives. <strong style="color:#fff">Suggested: $15</strong></p>
+
+      <div class="payments-grid" style="margin-top:14px">
+        <!-- Methods / Instructions -->
+        <div class="card">
+          <div class="content">
+            <h3 style="margin:0 0 8px">Payment Options</h3>
+            <div class="method" aria-label="QR code payment">
+              <div class="icon"><i class="fa-solid fa-qrcode"></i></div>
+              <div>
+                <strong>Scan & Pay (QR)</strong>
+                <p class="muted">Open your bank or wallet app and scan the QR. Add name in notes.</p>
+                <div class="qr" style="width:max-content; margin-top:8px">
+                  <img alt="Scan to pay — placeholder QR" src="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><rect width='100%' height='100%' fill='white'/><rect x='20' y='20' width='80' height='80' fill='black'/><rect x='220' y='20' width='80' height='80' fill='black'/><rect x='20' y='220' width='80' height='80' fill='black'/><rect x='120' y='120' width='80' height='80' fill='black'/><rect x='220' y='220' width='80' height='80' fill='black'/><rect x='150' y='40' width='20' height='20' fill='black'/><rect x='150' y='260' width='20' height='20' fill='black'/><rect x='260' y='150' width='20' height='20' fill='black'/></svg>">
+                </div>
+              </div>
+            </div>
+
+            <div class="method" aria-label="Apple Pay">
+              <div class="icon"><i class="fa-brands fa-apple"></i></div>
+              <div>
+                <strong>Apple Pay</strong>
+                <p class="muted" id="applepay-note">Tap the button below to pay with Apple Pay.</p>
+                <button id="applepay" class="btn primary" style="margin-top:4px"><i class="fa-brands fa-apple"></i> Pay with Apple Pay</button>
+              </div>
+            </div>
+
+            <div class="method" aria-label="Bank transfer">
+              <div class="icon"><i class="fa-solid fa-building-columns"></i></div>
+              <div>
+                <strong>Direct Bank Transfer</strong>
+                <p class="muted">Use your banking app and include your full name in the reference.</p>
+                <ul style="margin:8px 0; padding-left:18px; line-height:1.7">
+                  <li><strong>Account Name:</strong> SASA Student Association</li>
+                  <li><strong>Account No:</strong> 0012345678</li>
+                  <li><strong>IBAN:</strong> XX00 1234 5678 9012 3456 78</li>
+                  <li><strong>Routing/BIC:</strong> ABCDUSXX</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:14px">
+              <div class="content">
+                <h3 style="margin:0 0 8px">Payment Confirmation</h3>
+                <p class="muted">After paying, submit this form so we can verify and activate your membership.</p>
+                <form id="payment-form" aria-label="Payment confirmation form">
+                  <label> Full Name
+                    <input required name="fullName" placeholder="First Last">
+                  </label>
+                  <div class="grid" style="grid-template-columns: 1fr 1fr; gap:10px">
+                    <label> Method
+                      <select name="method" required>
+                        <option value="QR">QR</option>
+                        <option value="Apple Pay">Apple Pay</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                      </select>
+                    </label>
+                    <label> Amount (USD)
+                      <input required type="number" name="amount" min="1" step="1" value="15">
+                    </label>
+                  </div>
+                  <button class="btn primary" type="submit"><i class="fa-solid fa-check"></i>Submit Confirmation</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Dashboard -->
+        <div class="card" role="region" aria-labelledby="dashboard-title">
+          <div class="content">
+            <h3 id="dashboard-title" style="margin:0 0 8px">Member Payments — Live Feed</h3>
+            <table class="table" aria-describedby="dashboard-title"><thead>
+              <tr><th>Name</th><th>Date</th><th>Method</th><th>Amount</th></tr>
+            </thead>
+            <tbody id="payment-rows"></tbody>
+            </table>
+            <p class="muted" style="margin-top:8px">This dashboard updates in real‑time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap">
+      <div>© <span id="year"></span> SASA • South Asian Student Association</div>
+      <div style="display:flex; gap:12px; align-items:center">
+        <a href="#home" class="btn ghost" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i> Top</a>
+        <a href="/gallery.html" class="btn ghost" aria-label="Open full gallery page"><i class="fa-regular fa-images"></i> Full Gallery</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Lightbox Overlay -->
+  <div id="lightbox" class="lightbox" aria-modal="true" role="dialog" aria-label="Image viewer">
+    <button class="close" aria-label="Close" title="Close"><i class="fa-solid fa-xmark"></i></button>
+    <button class="prev" aria-label="Previous image" title="Previous"><i class="fa-solid fa-chevron-left"></i></button>
+    <img alt="Expanded gallery image" src="" />
+    <button class="next" aria-label="Next image" title="Next"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
   <script>
-  const API_BASE = 'http://localhost:5050/api';
-  const tbody = document.getElementById('payment-rows');
-  function fmt(ts){return new Intl.DateTimeFormat(undefined,{year:'numeric',month:'short',day:'2-digit'}).format(new Date(ts))}
+  // ---------- Config ----------
+  const API_BASE = 'https://sasa.yourdomain.com/api';
 
-  document.getElementById('contact-form').addEventListener('submit',async e=>{
-    e.preventDefault();
-    const fd=new FormData(e.target);
-    const body=Object.fromEntries(fd.entries());
-    const r=await fetch(`${API_BASE}/contact`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const d=await r.json();
-    alert(d.ok?'Thanks! We will be in touch.':(d.error||d.errors?.join('\n')));
-    if(d.ok)e.target.reset();
-  });
+  // ---------- Data (sample/placeholder for content sections) ----------
+  const upcomingEvents = [
+    {title:"Diwali Dhamaka Night", date:"2025-10-28", time:"18:00", location:"Main Ballroom", img:"https://images.unsplash.com/photo-1504177847826-161a0a2f784b?q=80&w=1600&auto=format&fit=crop", desc:"Lights, music, food stalls, and dance showcase."},
+    {title:"Chai & Chat: Mentorship Mixer", date:"2025-11-08", time:"16:30", location:"Student Union 203", img:"https://images.unsplash.com/photo-1529032590937-a3cfa56033c1?q=80&w=1600&auto=format&fit=crop", desc:"Meet mentors and peers over chai and snacks."},
+    {title:"Bollywood Garba Night", date:"2025-11-21", time:"19:00", location:"Rec Center Court A", img:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1600&auto=format&fit=crop", desc:"Dandiya, DJ, and dress vibrant!"},
+    {title:"Service Day: Winter Clothing Drive", date:"2025-12-05", time:"10:00", location:"Community Center", img:"https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=1600&auto=format&fit=crop", desc:"Give back with SASA — donations & volunteering."}
+  ];
 
-  document.getElementById('payment-form').addEventListener('submit',async e=>{
-    e.preventDefault();
-    const fd=new FormData(e.target);
-    const body={fullName:fd.get('fullName'),method:fd.get('method'),amount:Number(fd.get('amount')||15)};
-    const r=await fetch(`${API_BASE}/payments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const d=await r.json();
-    alert(d.ok?'Thanks! Payment recorded.':(d.error||d.errors?.join('\n')));
-    if(d.ok)e.target.reset();
-  });
+  const teamMembers = [
+    {name:"Anika Sharma", role:"President", img:"https://images.unsplash.com/photo-1554151228-14d9def656e4?q=80&w=1600&auto=format&fit=crop", bio:"Leads strategy and partnerships.", email:"anika@university.edu", ig:"https://instagram.com/"},
+    {name:"Rohan Khan", role:"Vice President", img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1600&auto=format&fit=crop", bio:"Programs and membership growth.", email:"rohan@university.edu", ig:"https://instagram.com/"},
+    {name:"Maya Patel", role:"Treasurer", img:"https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1600&auto=format&fit=crop", bio:"Finance, grants, and sponsorships.", email:"maya@university.edu", ig:"https://instagram.com/"},
+    {name:"Arjun Mehta", role:"Events Lead", img:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=1600&auto=format&fit=crop", bio:"Curates our cultural calendar.", email:"arjun@university.edu", ig:"https://instagram.com/"},
+    {name:"Sara Rahman", role:"Marketing Director", img:"https://images.unsplash.com/photo-1544006659-f0b21884ce1d?q=80&w=1600&auto=format&fit=crop", bio:"Brand and storytelling.", email:"sara@university.edu", ig:"https://instagram.com/"},
+    {name:"Dev Patel", role:"Community Outreach", img:"https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=1600&auto=format&fit=crop", bio:"Service and partnerships.", email:"dev@university.edu", ig:"https://instagram.com/"}
+  ];
 
-  async function fetchPayments(){
-    const r=await fetch(`${API_BASE}/payments?limit=25`);
-    const d=await r.json();
-    if(!d.ok)return;
-    tbody.innerHTML=d.payments.map(p=>`<tr><td>${p.name}</td><td>${fmt(p.ts)}</td><td><span class='pill'>${p.method}</span></td><td>$${p.amount.toFixed(2)}</td></tr>`).join('');
+  const pastEvents = [
+    { name:"Holi Color Fest", date:"Mar 24, 2025", desc:"Campus green turned rainbow with music and snacks.", photos:[
+      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1520974471612-624a5b69441f?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1520975661595-6453be3f7070?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1487412912498-0447578fcca8?q=80&w=1600&auto=format&fit=crop"
+    ]},
+    { name:"Eid Community Iftar", date:"Apr 7, 2025", desc:"Shared meal after sunset with reflections and charity drive.", photos:[
+      "https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1556909215-43c5ab3edc96?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1551218370-49e1d0a4e3a4?q=80&w=1600&auto=format&fit=crop"
+    ]},
+    { name:"South Asia Night Showcase", date:"May 10, 2025", desc:"Dance crews, classical music, and regional foods.", photos:[
+      "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1464375117522-1311d3562ac9?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1522771930-78848d9293e8?q=80&w=1600&auto=format&fit=crop"
+    ]}
+  ];
+
+  // ---------- DOM Helpers ----------
+  const $ = (s,root=document)=>root.querySelector(s);
+  const $$ = (s,root=document)=>Array.from(root.querySelectorAll(s));
+  const fmtDate = (d)=> new Intl.DateTimeFormat(undefined, {year:'numeric', month:'short', day:'2-digit'}).format(d);
+
+  // ---------- Render Sections ----------
+  function renderUpcoming(){
+    const grid = document.getElementById('events-grid');
+    const today = new Date();
+    const next = upcomingEvents
+      .filter(e=> new Date(e.date) >= new Date(today.toDateString()))
+      .sort((a,b)=> new Date(a.date)-new Date(b.date))
+      .slice(0,3);
+    grid.innerHTML = next.map(e=> `
+      <article class="card" aria-label="Event: ${e.title}">
+        <div class="media"><img src="${e.img}" alt="${e.title}"></div>
+        <div class="content">
+          <h3 style="margin:0 0 4px">${e.title}</h3>
+          <div class="meta"><span><i class="fa-regular fa-calendar"></i> ${fmtDate(new Date(e.date))}</span> <span><i class="fa-regular fa-clock"></i> ${e.time}</span> <span><i class="fa-solid fa-location-dot"></i> ${e.location}</span></div>
+          <p class="muted" style="margin:8px 0 0">${e.desc}</p>
+        </div>
+      </article>
+    `).join('');
   }
-  fetchPayments();
 
-  function startSSE(){
-    const ev=new EventSource(`${API_BASE.replace('/api','')}/api/payments/stream`);
-    ev.addEventListener('payment',e=>{
-      const p=JSON.parse(e.data);
-      const row=document.createElement('tr');
-      row.innerHTML=`<td>${p.name}</td><td>${fmt(p.ts)}</td><td><span class='pill'>${p.method}</span></td><td>$${p.amount.toFixed(2)}</td>`;
-      tbody.prepend(row);
+  function renderTeam(){
+    const grid = document.getElementById('team-grid');
+    grid.innerHTML = teamMembers.map(m=> `
+      <article class="card" aria-label="${m.role}: ${m.name}">
+        <img class="avatar" src="${m.img}" alt="${m.name}">
+        <div class="content">
+          <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start">
+            <div>
+              <h3 style="margin:0">${m.name}</h3>
+              <div class="muted" style="font-size:14px">${m.role}</div>
+            </div>
+            <span class="pill">Core</span>
+          </div>
+          <p class="muted">${m.bio}</p>
+          <div class="socials">
+            <a href="mailto:${m.email}" aria-label="Email ${m.name}"><i class="fa-solid fa-envelope"></i></a>
+            <a href="${m.ig}" target="_blank" rel="noopener" aria-label="${m.name} on Instagram"><i class="fa-brands fa-instagram"></i></a>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  // Past events + Lightbox
+  let lightboxImages = []; let lightboxIndex = 0;
+  function renderPast(){
+    const host = document.getElementById('past-events');
+    host.innerHTML = pastEvents.map(ev=>{
+      const imgs = ev.photos.map((src,i)=>`<img src="${src}" alt="${ev.name} photo ${i+1}" data-group="${ev.name}">`).join('');
+      return `
+        <article class="card" style="margin:12px 0" aria-label="Past event ${ev.name}">
+          <div class="content">
+            <h3 style="margin:0">${ev.name} <span class="pill" style="margin-left:6px">${ev.date}</span></h3>
+            <p class="muted">${ev.desc}</p>
+            <div class="gallery-grid">${imgs}</div>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    host.addEventListener('click', (e)=>{
+      const img = e.target.closest('img'); if(!img) return;
+      lightboxImages = $$("img", img.closest('.gallery-grid')).map(i=> i.src);
+      lightboxIndex = lightboxImages.indexOf(img.src);
+      openLightbox();
     });
   }
-  startSSE();
+  function openLightbox(){ const lb = document.getElementById('lightbox'); $('img', lb).src = lightboxImages[lightboxIndex]; lb.classList.add('open'); lb.focus(); }
+  function closeLightbox(){ $('#lightbox').classList.remove('open'); }
+  function navLightbox(dir){ lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length; $('img', $('#lightbox')).src = lightboxImages[lightboxIndex]; }
+  $('#lightbox .close').addEventListener('click', closeLightbox);
+  $('#lightbox .prev').addEventListener('click', ()=>navLightbox(-1));
+  $('#lightbox .next').addEventListener('click', ()=>navLightbox(1));
+  document.addEventListener('keydown', (e)=>{ if(!$('#lightbox').classList.contains('open')) return; if(e.key==='Escape') closeLightbox(); if(e.key==='ArrowLeft') navLightbox(-1); if(e.key==='ArrowRight') navLightbox(1); });
+
+  // ---------- Backend Wiring ----------
+  // Contact
+  $('#contact-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const body = Object.fromEntries(new FormData(e.target));
+    try{
+      const r = await fetch(`${API_BASE}/contact`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+      const d = await r.json();
+      alert(d.ok ? 'Thanks! We will be in touch.' : (d.error || d.errors?.join('\n')));
+      if(d.ok) e.target.reset();
+    }catch(err){ alert('Network error sending message.'); }
+  });
+
+  // Payments dashboard
+  async function loadPayments(){
+    try{
+      const r = await fetch(`${API_BASE}/payments?limit=25`);
+      const d = await r.json();
+      if(!d.ok) return;
+      const tbody = document.getElementById('payment-rows');
+      tbody.innerHTML = d.payments.map(p=>`<tr><td>${p.name}</td><td>${fmtDate(new Date(p.ts))}</td><td><span class="pill">${p.method}</span></td><td>$${Number(p.amount).toFixed(2)}</td></tr>`).join('');
+    }catch(err){ /* silent fail */ }
+  }
+
+  // SSE live updates
+  function startPaymentSSE(){
+    try{
+      const ev = new EventSource(`${API_BASE.replace('/api','')}/api/payments/stream`);
+      ev.addEventListener('payment', (evt)=>{
+        const p = JSON.parse(evt.data);
+        const tbody = document.getElementById('payment-rows');
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${p.name}</td><td>${fmtDate(new Date(p.ts))}</td><td><span class="pill">${p.method}</span></td><td>$${Number(p.amount).toFixed(2)}</td>`;
+        tbody.prepend(row);
+      });
+    }catch(err){ /* ignore */ }
+  }
+
+  // Confirmation form -> backend
+  $('#payment-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const entry = { fullName:f.get('fullName'), method:f.get('method'), amount:Number(f.get('amount')||15) };
+    try{
+      const r = await fetch(`${API_BASE}/payments`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(entry) });
+      const d = await r.json();
+      if(!d.ok){ alert(d.error || 'Failed to save payment.'); return; }
+      alert('Thanks! Your payment confirmation was received.');
+      e.target.reset();
+    }catch(err){ alert('Network error submitting payment.'); }
+  });
+
+  // Apple Pay (real validation via backend)
+  (function initApplePay(){
+    const btn = document.getElementById('applepay');
+    const note = document.getElementById('applepay-note');
+    if(!(window.ApplePaySession && ApplePaySession.canMakePayments())){
+      note.textContent = 'Apple Pay not available on this device/browser.';
+    }
+
+    btn.addEventListener('click', async ()=>{
+      if(!(window.ApplePaySession && ApplePaySession.canMakePayments())){
+        alert('Apple Pay not available on this device/browser.'); return;
+      }
+
+      const paymentRequest = {
+        countryCode: 'US', // adjust to your country
+        currencyCode: 'USD',
+        merchantCapabilities: ['supports3DS'],
+        supportedNetworks: ['visa','masterCard','amex','discover'],
+        total: { label: 'SASA Membership', amount: '15.00' },
+        requiredBillingContactFields: ['name','email']
+      };
+
+      const session = new ApplePaySession(3, paymentRequest);
+
+      session.onvalidatemerchant = async (event) => {
+        try{
+          const res = await fetch(`${API_BASE}/apple-pay/validate-session`, {
+            method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ validationURL: event.validationURL })
+          });
+          const merchantSession = await res.json();
+          session.completeMerchantValidation(merchantSession);
+        }catch(err){ session.abort(); alert('Merchant validation failed.'); }
+      };
+
+      session.onpaymentauthorized = async (event) => {
+        // Normally you would send token to your PSP to charge. Here we record the payment for the dashboard.
+        const billingName = event.payment?.billingContact?.givenName ? `${event.payment.billingContact.givenName} ${event.payment.billingContact.familyName||''}`.trim() : 'Apple Pay Member';
+        try{
+          await fetch(`${API_BASE}/payments`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ fullName: billingName, method: 'Apple Pay', amount: 15 }) });
+          session.completePayment(ApplePaySession.STATUS_SUCCESS);
+          alert('Apple Pay successful. Thank you!');
+        }catch(err){ session.completePayment(ApplePaySession.STATUS_FAILURE); alert('Apple Pay failed to record payment.'); }
+      };
+
+      session.oncancel = ()=>{};
+      session.begin();
+    });
+  })();
+
+  // ---------- Init ----------
+  renderUpcoming();
+  renderTeam();
+  renderPast();
+  loadPayments();
+  startPaymentSSE();
+  document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
-
