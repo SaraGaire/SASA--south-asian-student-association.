@@ -1,53 +1,98 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SASA — South Asian Student Association</title>
+  <meta name="description" content="SASA (South Asian Student Association) — community, culture, connection. Join events, meet the team, view galleries, and become a member."> 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  <style>
+    body{margin:0;font-family:Inter,sans-serif;color:#fff;background:#0f1220;}
+    section{padding:80px 20px;max-width:1180px;margin:auto}
+    .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:999px;padding:12px 18px;cursor:pointer;font-weight:700;text-decoration:none}
+    .btn.primary{background:linear-gradient(135deg,#ff9933,#f2a93b);color:#1b1202}
+    .btn.ghost{background:rgba(255,255,255,.08);color:#fff}
+    .card{background:rgba(255,255,255,.08);border-radius:16px;padding:16px;margin:8px 0}
+    .pill{padding:4px 10px;border-radius:999px;font-size:12px;background:rgba(255,255,255,.06)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.1)}
+  </style>
+</head>
+<body>
+  <section id="contact">
+    <h2>Contact Us</h2>
+    <form id="contact-form">
+      <input name="name" placeholder="Name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <textarea name="message" placeholder="Message" required></textarea>
+      <button class="btn primary">Send</button>
+    </form>
+  </section>
+  <section id="payments">
+    <h2>Membership Payments</h2>
+    <form id="payment-form">
+      <input name="fullName" placeholder="Full Name" required>
+      <select name="method" required>
+        <option value="QR">QR</option>
+        <option value="Apple Pay">Apple Pay</option>
+        <option value="Bank Transfer">Bank Transfer</option>
+      </select>
+      <input name="amount" type="number" min="1" step="1" value="15" required>
+      <button class="btn primary">Submit Confirmation</button>
+    </form>
+    <h3>Recent Payments</h3>
+    <table>
+      <thead><tr><th>Name</th><th>Date</th><th>Method</th><th>Amount</th></tr></thead>
+      <tbody id="payment-rows"></tbody>
+    </table>
+  </section>
+  <script>
+  const API_BASE = 'http://localhost:5050/api';
+  const tbody = document.getElementById('payment-rows');
+  function fmt(ts){return new Intl.DateTimeFormat(undefined,{year:'numeric',month:'short',day:'2-digit'}).format(new Date(ts))}
 
+  document.getElementById('contact-form').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const fd=new FormData(e.target);
+    const body=Object.fromEntries(fd.entries());
+    const r=await fetch(`${API_BASE}/contact`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    alert(d.ok?'Thanks! We will be in touch.':(d.error||d.errors?.join('\n')));
+    if(d.ok)e.target.reset();
+  });
 
-<!-- EVENTS -->
-<section id="events" class="page" tabindex="-1">
-<div class="events-page">
-<div class="events-header">
-<h1>Upcoming Events</h1>
-<p>Experience the culture, food, and fun with our upcoming events!</p>
-</div>
-<div class="events-container" id="eventsContainer"></div>
-<div class="events-controls">
-<button class="add-event-btn" id="addEventBtn">Add Event</button>
-</div>
-</div>
-</section>
+  document.getElementById('payment-form').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const fd=new FormData(e.target);
+    const body={fullName:fd.get('fullName'),method:fd.get('method'),amount:Number(fd.get('amount')||15)};
+    const r=await fetch(`${API_BASE}/payments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    alert(d.ok?'Thanks! Payment recorded.':(d.error||d.errors?.join('\n')));
+    if(d.ok)e.target.reset();
+  });
 
+  async function fetchPayments(){
+    const r=await fetch(`${API_BASE}/payments?limit=25`);
+    const d=await r.json();
+    if(!d.ok)return;
+    tbody.innerHTML=d.payments.map(p=>`<tr><td>${p.name}</td><td>${fmt(p.ts)}</td><td><span class='pill'>${p.method}</span></td><td>$${p.amount.toFixed(2)}</td></tr>`).join('');
+  }
+  fetchPayments();
 
-<!-- GALLERY -->
-<section id="gallery" class="page" tabindex="-1">
-<div class="gallery-page">
-<div class="gallery-header">
-<h1>Gallery</h1>
-<p>Highlights from our community moments</p>
-</div>
-
-
-<div class="gallery-controls">
-<div class="filter-buttons" id="filterButtons"></div>
-<button class="add-photo-btn" id="addPhotoBtn">Add Photo</button>
-</div>
-
-
-<div class="gallery-grid" id="galleryGrid"></div>
-</div>
-</section>
-</main>
-
-
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" aria-modal="true" role="dialog" aria-label="Image viewer">
-<div class="lightbox-content">
-<img src="" alt="" class="lightbox-image" id="lightboxImage" />
-<button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
-<button class="lightbox-prev" id="lightboxPrev" aria-label="Previous image">&#10094;</button>
-<button class="lightbox-next" id="lightboxNext" aria-label="Next image">&#10095;</button>
-</div>
-</div>
-
-
-<script src="script.js" defer></script>
+  function startSSE(){
+    const ev=new EventSource(`${API_BASE.replace('/api','')}/api/payments/stream`);
+    ev.addEventListener('payment',e=>{
+      const p=JSON.parse(e.data);
+      const row=document.createElement('tr');
+      row.innerHTML=`<td>${p.name}</td><td>${fmt(p.ts)}</td><td><span class='pill'>${p.method}</span></td><td>$${p.amount.toFixed(2)}</td>`;
+      tbody.prepend(row);
+    });
+  }
+  startSSE();
+  </script>
 </body>
 </html>
+
